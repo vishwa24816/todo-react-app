@@ -1,140 +1,97 @@
-# Go-based LinkedIn Automation Tool
+This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-This project is a proof-of-concept for a Go-based LinkedIn automation tool using the `Rod` library, showcasing advanced browser automation capabilities, human-like behavior simulation, and sophisticated anti-bot detection techniques.
+# Getting Started
 
-## Features
+> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
 
-*   **Authentication System**:
-    *   Login using credentials from environment variables or `config.yaml`.
-    *   Graceful handling of login failures and security checkpoints.
-    *   Persistence and reuse of session cookies.
-*   **Search & Targeting**:
-    *   Search users by job title, company, location, and keywords.
-    *   Efficient parsing and collection of profile URLs.
-    *   Handling pagination across search results.
-    *   Basic duplicate profile detection.
-*   **Connection Requests**:
-    *   Navigation to user profiles.
-    *   Targeted clicking of the "Connect" button.
-    *   Sending personalized notes within character limits.
-    *   Tracking sent requests and enforcing daily limits using SQLite.
-*   **Messaging System**:
-    *   Sending follow-up messages automatically to "accepted" connections.
-    *   Support for templates with dynamic variables.
-    *   Comprehensive message tracking using SQLite.
-*   **Anti-Bot Detection Strategy**:
-    *   **Human-like Mouse Movement**: Basic simulation (more advanced implementation is a TODO).
-    *   **Randomized Timing Patterns**: Random delays between actions.
-    *   **Browser Fingerprint Masking**: Applied on a *per-page basis* by injecting JavaScript to modify user agent strings, adjust viewport dimensions, and disable automation flags (`navigator.webdriver`).
-    *   **Random Scrolling Behavior**: Variable scroll speeds and micro-pauses.
-    *   **Realistic Typing Simulation**: Varying keystroke intervals.
-*   **Code Quality Standards**:
-    *   Modular Architecture (organized into packages: `authentication`, `search`, `messaging`, `stealth`, `config`, `storage`).
-    *   Robust Error Handling.
-    *   Structured Logging (using standard `log` package).
-    *   State Persistence using SQLite.
+## Step 1: Start Metro
 
-## Project Structure
+First, you will need to run **Metro**, the JavaScript build tool for React Native.
 
-```
-.
-├── main.go
-├── config.yaml
-├── go.mod
-├── go.sum
-├── linkedin_automation.db (generated after first run)
-├── authentication/
-│   └── authentication.go
-├── config/
-│   └── config.go
-├── connection/
-│   └── connection.go
-├── messaging/
-│   └── messaging.go
-├── search/
-│   └── search.go
-├── stealth/
-│   └── stealth.go
-└── storage/
-    └── storage.go
+To start the Metro dev server, run the following command from the root of your React Native project:
+
+```sh
+# Using npm
+npm start
+
+# OR using Yarn
+yarn start
 ```
 
-## Setup and Running
+## Step 2: Build and run your app
 
-### Prerequisites
+With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
 
-*   Go (version 1.18 or higher)
-*   Chrome or Chromium browser installed on your system (Rod uses it for automation)
+### Android
 
-### Installation
+```sh
+# Using npm
+npm run android
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [repository_url]
-    cd [repository_name]
-    ```
-    (Note: This step is conceptual as you are operating within a managed environment.)
-
-2.  **Download Go modules:**
-    ```bash
-    go mod tidy
-    ```
-
-### Configuration
-
-The application can be configured using a `config.yaml` file or environment variables.
-
-#### `config.yaml` Example:
-
-Create a `config.yaml` file in the project root:
-
-```yaml
-linkedin:
-  username: "your_linkedin_username"
-  password: "your_linkedin_password"
+# OR using Yarn
+yarn android
 ```
 
-#### Environment Variables:
+### iOS
 
-Alternatively, you can set environment variables with the prefix `LINKEDIN_AUTOMATION_`.
+For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
 
-Example:
-```bash
-$env:LINKEDIN_AUTOMATION_LINKEDIN_USERNAME="your_linkedin_username" # For PowerShell
-$env:LINKEDIN_AUTOMATION_LINKEDIN_PASSWORD="your_linkedin_password" # For PowerShell
-```
-or
-```bash
-export LINKEDIN_AUTOMATION_LINKEDIN_USERNAME="your_linkedin_username" # For Linux/macOS
-export LINKEDIN_AUTOMATION_LINKEDIN_PASSWORD="your_linkedin_password" # For Linux/macOS
+The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+
+```sh
+bundle install
 ```
 
-### Running the Tool
+Then, and every time you update your native dependencies, run:
 
-To run the tool, execute:
-
-```bash
-go run main.go
+```sh
+bundle exec pod install
 ```
 
-The tool will:
-1.  Load configuration.
-2.  Launch a browser.
-3.  Attempt to log in to LinkedIn (using saved cookies if available), applying per-page stealth.
-4.  Perform a sample search for "Software Engineer" in "San Francisco Bay Area" with "Go" and "Golang" keywords, applying per-page stealth.
-5.  Send connection requests to found profiles (up to a daily limit, and avoiding duplicates), applying per-page stealth.
-6.  Simulate accepted connections and send follow-up messages, applying per-page stealth.
+For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
 
-## Current Limitations / TODOs
+```sh
+# Using npm
+npm run ios
 
-*   **Rod API Challenges for Global Stealth**: Due to unexpected behavior and undefined methods (`browser.SetUserAgent`, `browser.SetViewport`, `browser.EvalOnNewDocument`) on the `rod.Browser` object in this specific environment, browser fingerprinting is currently implemented on a *per-page basis* by injecting JavaScript. A more robust, global solution would be preferred if environment constraints allow.
-*   **Human-like Mouse Movement**: This feature is currently disabled due to persistent Rod API limitations in this environment regarding precise mouse control. Ideally, it would involve sophisticated Bézier curve implementations with overshoot and micro-corrections.
-*   **LinkedIn UI Changes**: LinkedIn's UI changes frequently, which can break element selectors. The current selectors are illustrative and may need updates.
-*   **Advanced Anti-Bot Techniques**: Further enhancements for anti-bot detection could include WebGL fingerprinting, canvas fingerprinting, and more dynamic manipulation of browser properties.
-*   **Error Handling**: While basic error handling is in place, more graceful degradation and retry mechanisms could be added for specific scenarios (e.g., network issues, temporary LinkedIn errors).
-*   **Dynamic Data Extraction**: For sending personalized messages, extracting the recipient's name from their profile page is a crucial step that is currently simulated.
-*   **"New Connection" Detection**: The `DetectNewConnections` function is a placeholder; real-world implementation requires robust scraping of LinkedIn notifications or the "My Network" page, which is highly fragile.
+# OR using Yarn
+yarn ios
+```
 
-## License
+If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator or your connected device.
 
-This project is licensed under the MIT License.
+This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+
+## Step 3: Modify your app
+
+Now that you have successfully run the app, let's make changes!
+
+Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+
+When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+
+- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
+- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+
+## Congratulations! :tada:
+
+You've successfully run and modified your React Native App. :partying_face:
+
+### Now what?
+
+- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
+- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+
+# Troubleshooting
+
+If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+
+# Learn More
+
+To learn more about React Native, take a look at the following resources:
+
+- [React Native Website](https://reactnative.dev) - learn more about React Native.
+- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
+- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
+- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
